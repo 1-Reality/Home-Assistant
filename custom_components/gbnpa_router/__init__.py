@@ -1,4 +1,5 @@
 import logging
+import secrets
 import json
 from aiohttp import web
 from homeassistant.core import HomeAssistant
@@ -20,9 +21,18 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """通过 UI 配置初始化集成"""
     hass.data.setdefault(DOMAIN, {"devices": {}, "global": {}, "time_obj": None})
+    webhook_secret = entry.data.get("webhook_secret")
+    if not webhook_secret:
+        _LOGGER.error("[GBNPA] 缺少 webhook_secret，Webhook 未注册。请重新添加集成并设置鉴权密钥。")
+        return False
 
     async def handle_webhook(hass, webhook_id, request):
         """处理油猴发来的 JSON 数据包"""
+        request_secret = request.headers.get("X-GBNPA-Secret", "")
+        if not secrets.compare_digest(request_secret, webhook_secret):
+            _LOGGER.warning("[GBNPA] Webhook 鉴权失败，请求已拒绝")
+            return web.Response(status=401)
+
         try:
             text = await request.text()
             raw_payload = json.loads(text)
@@ -58,7 +68,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             _LOGGER.error(f"解析 GBNPA 数据包失败: {e}")
             return web.Response(status=400)
 
-    webhook.async_register(hass, DOMAIN, "GBNPA Router Sync", WEBHOOK_ID, handle_webhook)
+    webhook.async_register(hass, DOMAIN, "GBNPA Router Sync", WEBHOOK_ID, handle_webhook, allowed_methods=("POST",),)
     
     # 【新增】绑定前端按钮与底层清理逻辑
     async def handle_purge_service(call):
