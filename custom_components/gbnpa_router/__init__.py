@@ -28,12 +28,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def handle_webhook(hass, webhook_id, request):
         """处理油猴发来的 JSON 数据包"""
-        request_secret = request.headers.get("X-GBNPA-Secret", "")
-        if not secrets.compare_digest(request_secret, webhook_secret):
-            _LOGGER.warning("[GBNPA] Webhook 鉴权失败，请求已拒绝")
-            return web.Response(status=401)
-
         try:
+            request_secret = request.headers.get("X-GBNPA-Secret", "")
+            if not secrets.compare_digest(request_secret, webhook_secret):
+                _LOGGER.warning("[GBNPA] Webhook 鉴权失败，请求已拒绝")
+                return web.Response(status=401)
+
             text = await request.text()
             raw_payload = json.loads(text)
             data = raw_payload.get("payload", raw_payload)

@@ -61,11 +61,13 @@ The system has two parts — the HA receiver and the JS collector. Set them up i
 
 1. Make sure a browser on some 24/7 host (a home server) has the **[ScriptCat](https://scriptcat.org/zh-CN/script-show-page/6676)** extension installed.
 2. Import the collector JS script provided in this repo.
-3. At the top of the script, point the Webhook URL config at your HA address:
+3. During Config Flow setup, set a Webhook authentication secret and keep a copy of it.
+4. At the top of the script, set both the Webhook URL and the same `webhookSecret`:
 ```javascript
-const WEBHOOK_URL = "http://[your HA-reachable IP]:8123/api/webhook/gbnpa_router_webhook";
+const webhookUrl = "http://[your HA-reachable IP]:8123/api/webhook/gbnpa_router_webhook";
+const webhookSecret = "your authentication secret";
 ```
-4. Log in to the router's web admin panel and leave that tab running in the background — data will start streaming in real time.
+5. Log in to the router's web admin panel and leave that tab running in the background. If the secret does not match, Home Assistant returns HTTP 401.
 
 ## ⚙️ Architecture & Directory Structure
 

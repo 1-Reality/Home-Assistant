@@ -13,8 +13,19 @@ class GbnpaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
+        data_schema = vol.Schema({
+            vol.Required("sensor_mode", default=1): vol.In(SENSOR_MODES),
+            vol.Required("webhook_secret"): str,
+        })
+
         if user_input is not None:
+            user_input["webhook_secret"] = user_input["webhook_secret"].strip()
+            if not user_input["webhook_secret"]:
+                return self.async_show_form(
+                    step_id="user",
+                    data_schema=data_schema,
+                    errors={"webhook_secret": "required"},
+                )
             return self.async_create_entry(title="哥哥科技中枢", data=user_input)
 
-        data_schema = vol.Schema({vol.Required("sensor_mode", default=1): vol.In(SENSOR_MODES)})
         return self.async_show_form(step_id="user", data_schema=data_schema)

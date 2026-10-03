@@ -42,11 +42,13 @@
 ## 🚀 数据采集端部署
 1. 确保有某台常亮主机（Home Server）的浏览器上已安装 **[脚本猫 (ScriptCat)](https://scriptcat.org/zh-CN/script-show-page/6676)** 插件。
 2. 导入本项目提供的采集端 JS 脚本。
-3. 在脚本代码顶部的配置区，将 Webhook URL 指向你的 HA 地址：
+3. 添加集成时，在 Config Flow 中设置一个 Webhook 鉴权密钥，并记住它。
+4. 在脚本代码顶部，将 Webhook URL 指向你的 HA 地址，并把 `webhookSecret` 设置成与 HA 中完全相同的密钥：
 ```javascript
-const WEBHOOK_URL = "http://[HA的IP]:8123/api/webhook/gbnpa_router_webhook";
+const webhookUrl = "http://[HA的IP]:8123/api/webhook/gbnpa_router_webhook";
+const webhookSecret = "你的鉴权密钥";
 ```
-4. 登录路由器 Web 后台并保持该页面在后台运行，数据即可开始实时推送。
+5. 登录路由器 Web 后台并保持该页面在后台运行。若密钥不一致，HA 会返回 HTTP 401。
 
 ## ⚙️ 架构说明与目录结构 (Architecture)
 
