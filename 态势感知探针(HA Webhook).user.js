@@ -2,6 +2,9 @@
 // @name         态势感知探针 (HA Webhook)
 // @namespace    ucxn
 // @version      1.0.8
+// @license      MPL-2.0
+// @copyright    仅适用于此文件，不影响主项目，两者无关联
+// @note         HA集成的Python版权以实际文件夹目录为准
 // @description  后台静默运行，每10分钟定点旁路接收路由数据并送往HA
 // @author       哥哥科技
 // @background
